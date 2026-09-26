@@ -8,7 +8,7 @@ from tkinter import messagebox
 
 CELL_SIZE = 30
 COLUMNS = 10
-ROWS =23
+ROWS =25
 DELAY = 500  
 
 colour = "#00FF55"
