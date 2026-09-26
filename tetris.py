@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 import random
 import math
 import time
@@ -64,6 +65,9 @@ class Tetris:
         self.root = root
         self.canvas = tk.Canvas(root, width=COLUMNS*CELL_SIZE, height=ROWS*CELL_SIZE, bg='black')
         self.canvas.pack()
+        # paw picture for the pause screen (kept on self so tkinter doesn't throw it away)
+        paw_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images", "paw.png")
+        self.paw_image = tk.PhotoImage(file=paw_path)
         self.board = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
         self.current_shape = None
         self.current_pos = [0, 3]
@@ -204,7 +208,14 @@ class Tetris:
         if self.game_over:
             self.show_message("GAME OVER", "white")
         elif self.paused:
-            self.show_message("Paws", "yellow")
+            self.draw_pause_screen()
+
+    def draw_pause_screen(self):
+        # grey card so the black paw stands out, then the text with the paw underneath
+        cx, cy = COLUMNS*CELL_SIZE//2, ROWS*CELL_SIZE//2
+        self.canvas.create_rectangle(cx - 80, cy - 40, cx + 80, cy + 260, fill="gray30", outline="yellow", width=2)
+        self.show_message("Paws", "yellow")
+        self.canvas.create_image(cx, cy + 30, image=self.paw_image, anchor="n")
 
     def show_message(self, text, color):
         self.canvas.create_text(COLUMNS*CELL_SIZE//2, ROWS*CELL_SIZE//2, text=text, fill=color, font=("Arial", 24))

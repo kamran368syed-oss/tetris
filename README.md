@@ -10,7 +10,7 @@ I wrote it in my own time, with a friend giving me tips along the way.
 - The 7 classic Tetris pieces, plus 5 custom ones: a **stickman**, a 5-long bar,
   a 3×3 block, a 2×3 block and a corner piece
 - Pieces can be moved, rotated and dropped, and full rows are cleared
-- Pause and restart at any time
+- Pause and restart at any time. Pausing shows a "Paws" screen with a cat's paw
 
 ## Controls
 
