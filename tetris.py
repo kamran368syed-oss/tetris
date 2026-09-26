@@ -127,6 +127,8 @@ class Tetris:
             self.paused = not self.paused
 
     def reset_game(self):
+        # the tick loop stops at game over, so remember whether it needs restarting
+        was_game_over = self.game_over
         # get rid of any concurrent blocks
         self.board = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
         # start over
@@ -136,21 +138,26 @@ class Tetris:
         self.spawn_shape()
         # create a new canvas
         self.draw()
+        # restart the falling loop (only if it had stopped, otherwise pieces fall twice as fast)
+        if was_game_over:
+            self.root.after(DELAY, self.tick)
 
     def key_press(self, event):
         # pause toggle first
         if event.keysym in ['space', 'p', 'P']:
             self.toggle_pause()
-            self.canvas.create_text(COLUMNS*CELL_SIZE//2, ROWS*CELL_SIZE//2, text="Paws", fill="yellow", font=("Arial", 24))
+            self.draw()
             return
 
         if event.keysym == 'Escape':
             self.root.quit()
 
-        if event.keysym == 'R':
+        if event.keysym in ['r', 'R']:
             self.reset_game()
+            return
 
-        if self.game_over:
+        # no moving pieces while paused or after game over
+        if self.game_over or self.paused:
             return
             # movein
         if event.keysym in ['Left', 'a', 'A']:
@@ -170,7 +177,7 @@ class Tetris:
             if not self.game_over:
                 self.root.after(DELAY, self.tick)  # continue loop
             else:
-                self.canvas.create_text(COLUMNS*CELL_SIZE//2, ROWS*CELL_SIZE//2, text="GAME OVER", fill="white", font=("Arial", 24))
+                self.draw()  # draw() shows the GAME OVER message
             return
         
         self.drop()
@@ -193,6 +200,14 @@ class Tetris:
                     ny = self.current_pos[0] + y
                     if 0 <= nx < COLUMNS and 0 <= ny < ROWS:
                         self.draw_cell(nx, ny, COLORS[self.shape_type])
+        # messages go last so they sit on top and survive every redraw
+        if self.game_over:
+            self.show_message("GAME OVER", "white")
+        elif self.paused:
+            self.show_message("Paws", "yellow")
+
+    def show_message(self, text, color):
+        self.canvas.create_text(COLUMNS*CELL_SIZE//2, ROWS*CELL_SIZE//2, text=text, fill=color, font=("Arial", 24))
 
     def draw_cell(self, x, y, color):
         x1 = x * CELL_SIZE
